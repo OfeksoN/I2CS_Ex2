@@ -1,4 +1,6 @@
 import java.io.Serializable;
+import java.util.ArrayDeque;
+
 /**
  * This class represents a 2D map (int[w][h]) as a "screen" or a raster matrix or maze over integers.
  * This is the main class needed to be implemented.
@@ -255,13 +257,49 @@ public class Map implements Map2D, Serializable{
 	 */
 	public int fill(Pixel2D xy, int new_v, boolean cyclic) {
         int ans = 0;
-		int fx = xy.getX();
-        int fy = xy.getY();
-        int old = cells[fy][fx];
+		final int fx = xy.getX();
+        final int fy = xy.getY();
+        final int old = cells[fy][fx];
 		if (fy < 0 || fy >= cells[0].length || fx < 0 || fx >= cells.length || old == new_v){
             return ans;
         }
 
+        final int H = cells.length;
+        final int W = cells[0].length;
+
+        final boolean[][] visited = new boolean[H][W];
+        final ArrayDeque<int[]> q = new ArrayDeque<>();
+
+        visited[fy][fx] = true;
+        q.add(new int[]{fx, fy});
+
+        final int[][] ways = {{1,0},{-1,0},{0,1},{0,-1}};
+
+        while (!q.isEmpty()) {
+            int[] cur = q.removeFirst();
+            int x = cur[0], y = cur[1];
+
+            if (cells[y][x] == old) {
+                cells[y][x] = new_v;
+                ans++;
+            }
+
+            for (int[] d : ways) {
+                int nx = x + d[0], ny = y + d[1];
+
+                if (cyclic) {
+                    nx = ((nx % W) + W) % W;
+                    ny = ((ny % H) + H) % H;
+                } else {
+                    if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+                }
+
+                if (!visited[ny][nx] && cells[ny][nx] == old) {
+                    visited[ny][nx] = true;
+                    q.add(new int[]{nx, ny});
+                }
+            }
+    }
     return ans;
 	}
 
