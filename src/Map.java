@@ -10,16 +10,7 @@ public class Map implements Map2D, Serializable{
     private int width;
     private int height;
     private int[][] cells;
-
-
-    private boolean inBounds(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-    private void checkBounds(int x, int y) {
-        if (!inBounds(x, y)) {
-            throw new IndexOutOfBoundsException("Out of bounds: (" + x + "," + y + ") for " + width + "x" + height);
-        }
-    }
+    private int amount;
 
 
     // edit this class below
@@ -45,14 +36,17 @@ public class Map implements Map2D, Serializable{
 	}
 	@Override
 	public void init(int w, int h, int v) {
-        v = 0;
         if (w <= 0 || h <= 0) {
             throw new IllegalArgumentException("width and height must be > 0; got w=" + w + ", h=" + h);
         }
         this.width = w;
         this.height = h;
         this.cells = new int[h][w];
-        fill(v);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                cells[y][x] = v;
+            }
+        }
 	}
 	@Override
 	public void init(int[][] arr) {
@@ -162,23 +156,96 @@ public class Map implements Map2D, Serializable{
 
     @Override
     public void drawCircle(Pixel2D center, double rad, int color) {
-
+    int cx = center.getX();
+    int cy = center.getY();
+    int r = (int) Math.round(rad);
+    if (r < 0) {
+        throw new IllegalArgumentException("Radius must be >= 0");
+    }
+    if (r == 0){
+        setPixel(cx,cy,color);
+    }
+    if (r > 0){
+        int y = 0;
+        int x = r;
+        int err = 1-x;
+        while (x>=y){
+            setPixel(cx+x,cy+y,color);
+            setPixel(cx+y,cy+x,color);
+            setPixel(cx-y,cy+x,color);
+            setPixel(cx-y,cy-x,color);
+            setPixel(cx-x,cy+y,color);
+            setPixel(cx-x,cy-y,color);
+            setPixel(cx+y,cy-x,color);
+            setPixel(cx+x,cy-y,color);
+            y++;
+            if (err<0){
+                err += ((2*y) + 1);
+            }
+            else {
+                x--;
+                err += ((2*(y-x)) + 1);
+            }
+        }
+    }
     }
 
     @Override
     public void drawLine(Pixel2D p1, Pixel2D p2, int color) {
-
+        int x0 = p1.getX(), y0 = p1.getY();
+        int x1 = p2.getX(), y1 = p2.getY();
+        // Bresenham's line algorithm
+        int dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy;
+        while (true) {
+            setPixel(x0, y0, color);
+            if (x0 == x1 && y0 == y1) break;
+            int e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
     }
 
     @Override
     public void drawRect(Pixel2D p1, Pixel2D p2, int color) {
-
+        if (p1 == p2){
+            setPixel(p1.getX(), p1.getY(), color);
+        }
+        else{
+        int x1 = Math.min(p1.getX(), p2.getX());
+        int y1 = Math.min(p1.getY(), p2.getY());
+        int x2 = Math.max(p1.getX(), p2.getX());
+        int y2 = Math.max(p1.getY(), p2.getY());
+            for (int x = x1; x <=x2 ; x++){
+                setPixel(x,y1,color);
+                setPixel(x,y2,color);
+    }
+            for (int y = y1; y <=y2 ; y++) {
+                setPixel(x1, y, color);
+                setPixel(x2, y, color);
+            }
+        }
     }
 
     @Override
     public boolean equals(Object ob) {
         boolean ans = false;
-
+        if (this == ob) {
+            ans = true;
+        }
+        if (!(ob instanceof Map2D)) {
+            ans = false;
+        }
+        Map2D other = (Map2D) ob;
+        if (other.getWidth() != width || other.getHeight() != height)
+            ans = false;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (cells[y][x] != other.getPixel(x, y)) ;
+                ans = false;
+            }
+        }
         return ans;
     }
 	@Override
@@ -186,10 +253,16 @@ public class Map implements Map2D, Serializable{
 	 * Fills this map with the new color (new_v) starting from p.
 	 * https://en.wikipedia.org/wiki/Flood_fill
 	 */
-	public int fill(Pixel2D xy, int new_v,  boolean cyclic) {
-		int ans = -1;
+	public int fill(Pixel2D xy, int new_v, boolean cyclic) {
+        int ans = 0;
+		int fx = xy.getX();
+        int fy = xy.getY();
+        int old = cells[fy][fx];
+		if (fy < 0 || fy >= cells[0].length || fx < 0 || fx >= cells.length || old == new_v){
+            return ans;
+        }
 
-		return ans;
+    return ans;
 	}
 
 	@Override
@@ -209,5 +282,35 @@ public class Map implements Map2D, Serializable{
         return ans;
     }
 	////////////////////// Private Methods ///////////////////////
+    private boolean inBounds(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+    private void checkBounds(int x, int y) {
+        if (!inBounds(x, y)) {
+            throw new IndexOutOfBoundsException("Out of bounds: (" + x + "," + y + ") for " + width + "x" + height);
+        }
+    }
+    private void paint(int x, int y, int color){
+        if (inBounds(x, y)){
+            cells[y][x] = color;
+        }
+    }
+    private boolean CircleContains(Pixel2D p,Pixel2D center, double r) {
+        return r >= p.distance2D(center);
+    }
+    private int fillHelper(int cells[][], int x, int y,int new_v, int v){
+        if (x<0 || y<0 || x>= cells.length || y>= cells[0].length || cells[x][y] != v){
+            amount+=0;
+        }
+        else {
+            cells[x][y] = new_v;
 
+            fillHelper(cells, x + 1, y, new_v, v);
+            fillHelper(cells, x - 1, y, new_v, v);
+            fillHelper(cells, x, y + 1, new_v, v);
+            fillHelper(cells, x, y - 1, new_v, v);
+            amount += 1;
+        }
+        return amount;
+    }
 }
