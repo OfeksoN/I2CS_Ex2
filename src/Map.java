@@ -16,7 +16,7 @@ public class Map implements Map2D, Serializable {
     private int height;
     private int[][] cells;
     private int amount;
-
+    private int DEFAULT = 0;
 
     // edit this class below
 
@@ -48,6 +48,9 @@ public class Map implements Map2D, Serializable {
     public Map(int[][] data) {
         init(data);
     }
+    public Map() {
+        init(100,100,DEFAULT);
+    }
 
     @Override
     public void init(int w, int h, int v) {
@@ -57,7 +60,7 @@ public class Map implements Map2D, Serializable {
         this.width = w;
         this.height = h;
         this.cells = new int[h][w];
-        for (int y = 0; y < height; y++) {
+        for (int y = 0; y < h; y++) {
             for (int x = 0; x < width; x++) {
                 cells[y][x] = v;
             }
@@ -67,19 +70,25 @@ public class Map implements Map2D, Serializable {
     @Override
 
     public void init(int[][] arr) {
-        if (arr == null || arr.length == 0 || arr[0] == null)
-            throw new IllegalArgumentException("input array must be non-null and rectangular");
+//        if (arr == null || arr.length == 0 || arr[0] == null)
+//            throw new IllegalArgumentException("input array must be non-null and rectangular");
         int H = arr.length;
         int W = arr[0].length;
-        for (int y = 1; y < H; y++) {
-            if (arr[y] == null || arr[y].length != W)
-                throw new IllegalArgumentException("input array must be rectangular");
-        }
+//        for (int y = 1; y < H; y++) {
+//            if (arr[y] == null || arr[y].length != W)
+//                throw new IllegalArgumentException("input array must be rectangular");
+//        }
         this.width = W;
         this.height = H;
         this.cells = new int[H][W];
+
+//        for (int y = 0; y < H; y++) {
+//            this.cells[y] = Arrays.copyOf(arr[y], H);
+//        }
         for (int y = 0; y < H; y++) {
-            System.arraycopy(arr[y], 0, this.cells[y], 0, W);
+            for (int x = 0; x < W; x++) {
+                this.cells[y][x] = arr[y][x];
+            }
         }
     }
 
@@ -261,22 +270,22 @@ public class Map implements Map2D, Serializable {
 
     @Override
     public boolean equals(Object ob) {
-        boolean ans = false;
-        if (this == ob) {
-            ans = true;
-        }
-        if (!(ob instanceof Map2D)) {
-            ans = false;
-        }
-        Map2D other = (Map2D) ob;
-        if (other.getWidth() != width || other.getHeight() != height)
-            ans = false;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (cells[y][x] != other.getPixel(x, y)) {
-                    ans = false;
+        boolean ans = true;
+        if(ob instanceof Map){
+            Map m = (Map)ob;
+            if(m.width == this.width && m.height == this.height) {
+                for (int y = 0; y < this.height; y++) {
+                    for (int x = 0; x < this.width; x++) {
+                        if (this.cells[y][x] != m.cells[y][x]) {
+                            return false;
+                        }
+                    }
                 }
+            }else{
+                return  false;
             }
+        }else{
+            return false;
         }
         return ans;
     }
