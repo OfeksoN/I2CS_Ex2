@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,8 +18,6 @@ public class Map implements Map2D, Serializable {
     private int[][] cells;
     private int amount;
     private int DEFAULT = 0;
-
-    // edit this class below
 
     /**
      * Constructs a w*h 2D raster map with an init value v.
@@ -459,7 +458,7 @@ public class Map implements Map2D, Serializable {
 
         final boolean[][] visited = new boolean[H][W];
         final ArrayDeque<int[]> q = new ArrayDeque<>();
-        final int[][] DIR4 = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        final int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
         visited[sy][sx] = true;
         dist[sy][sx] = 0;
@@ -469,7 +468,7 @@ public class Map implements Map2D, Serializable {
             int[] cur = q.removeFirst();
             int x = cur[0], y = cur[1];
 
-            for (int[] d : DIR4) {
+            for (int[] d : directions) {
                 int nx = x + d[0], ny = y + d[1];
 
                 if (cyclic) {
@@ -499,29 +498,6 @@ public class Map implements Map2D, Serializable {
         if (!inBounds(x, y)) {
             throw new IndexOutOfBoundsException("Out of bounds: (" + x + "," + y + ") for " + width + "x" + height);
         }
-    }
-    private void paint(int x, int y, int color){
-        if (inBounds(x, y)){
-            cells[y][x] = color;
-        }
-    }
-    private boolean CircleContains(Pixel2D p,Pixel2D center, double r) {
-        return r >= p.distance2D(center);
-    }
-    private int fillHelper(int cells[][], int x, int y,int new_v, int v){
-        if (x<0 || y<0 || x>= cells.length || y>= cells[0].length || cells[x][y] != v){
-            amount+=0;
-        }
-        else {
-            cells[x][y] = new_v;
-
-            fillHelper(cells, x + 1, y, new_v, v);
-            fillHelper(cells, x - 1, y, new_v, v);
-            fillHelper(cells, x, y + 1, new_v, v);
-            fillHelper(cells, x, y - 1, new_v, v);
-            amount += 1;
-        }
-        return amount;
     }
 
 }

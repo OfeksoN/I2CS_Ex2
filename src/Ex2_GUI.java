@@ -9,6 +9,28 @@ import java.awt.Color;
  *
  */
 public class Ex2_GUI {
+    private static final Color[] COLORS = {
+            Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY,
+            Color.GRAY, Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA,
+            Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW
+    };
+    public static final int BLACK = 0;
+    public static final int BLUE = 1;
+    public static final int CYAN = 2;
+    public static final int DARK_GRAY = 3;
+    public static final int GRAY = 4;
+    public static final int GREEN = 5;
+    public static final int LIGHT_GRAY = 6;
+    public static final int MAGENTA = 7;
+    public static final int ORANGE = 8;
+    public static final int PINK = 9;
+    public static final int RED = 10;
+    public static final int WHITE = 11;
+    public static final int YELLOW = 12;
+
+
+
+
     public static void drawMap(Map2D map) {
             int W = map.getWidth();
             int H = map.getHeight();
@@ -23,20 +45,18 @@ public class Ex2_GUI {
             for (int y = 0; y < H; y++) {
                 for (int x = 0; x < W; x++) {
                     int v = map.getPixel(x, y);
-
-                    // Map your cell value -> a color
-                    Color c = colorForValue(v);
+                    Color c = COLORS[v];;
 
                     StdDraw.setPenColor(c);
-                    int drawY = y; // or: int drawY = (H - 1) - y;
-                   //StdDraw.filledRectangle(x + 0.5, drawY + 0.5, 0.5, 0.5);
-                    StdDraw.filledSquare( x + 0.5, drawY + 0.5, 0.4);
+                    StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.5, 0.5);
+                    //StdDraw.filledSquare( x + 0.5, y + 0.5, 0.5);
+
 
                 }
             }
 
 
-            StdDraw.setPenColor(new Color(0,0,0,40)); // subtle
+            StdDraw.setPenColor(new Color(0,0,0,40));
             StdDraw.setPenRadius(0.015);
             for (int x = 0; x <= W; x++) {
                 StdDraw.line(x, 0, x, H);
@@ -132,9 +152,13 @@ public class Ex2_GUI {
 
         public static void main(String[] a) {
 
-            Map sample = new Map(100,100,1);
+            Map sample = new Map(100,100,0);
+            Index2D p1 = new Index2D(50,50);
+            Index2D p2 = new Index2D(60 , 60);
+            sample.drawCircle(p1, 20, 11);
+            int rgb = sample.getPixel(p1);
+            Color c = new Color(rgb, true);
             saveMap(sample, "map.txt");
-
 
             // Now load & draw
             Map2D map = loadMap("map.txt");
@@ -143,30 +167,4 @@ public class Ex2_GUI {
 
 ///////////////// Private functions ///////////////
 
-    public static void drawPath(Pixel2D[] path, Color color) {
-        if (path == null) return;
-        StdDraw.setPenColor(color);
-        for (Pixel2D p : path) {
-            double cx = p.getX() + 0.5;
-            double cy = p.getY() + 0.5; // flip if needed
-            StdDraw.filledCircle(cx, cy, 0.35);
-        }
-        StdDraw.show();
 
-    }
-        public static Color colorForValue(int v) {
-            // Example scheme:
-            // - Obstacles: black (1)
-            // - Start/Goal markers: special colors (if you encode them)
-            // - Distances/other: a blue-ish gradient
-            if (v == 1) return Color.BLACK;     // obstacle
-            if (v == 0) return new Color(230, 230, 230); // empty
-
-            // Simple gradient for positive values:
-            // clamp v for color scaling
-            int t = Math.max(1, Math.min(v, 100));
-            int r = 20;
-            int g = 50 + (int)(205 * (1.0 - t/100.0));
-            int b = 255 - (int)(200 * (t/100.0));
-            return new Color(r, g, b);
-        }
