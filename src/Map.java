@@ -312,7 +312,8 @@ public class Map implements Map2D, Serializable {
         visited[fy][fx] = true;
         q.add(new int[]{fx, fy});
 
-        final int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}};
+
         while (!q.isEmpty()) {
             int[] cur = q.removeFirst();
             int x = cur[0];
@@ -350,87 +351,90 @@ public class Map implements Map2D, Serializable {
      */
     public Pixel2D[] shortestPath(Pixel2D p1, Pixel2D p2, int obsColor, boolean cyclic) {
         Pixel2D[] ans = null;// the result.
+
+        if (p1 == null || p2 == null) return null;
         final int H = cells.length;
         final int W = cells[0].length;
 
         final int sx = p1.getX(), sy = p1.getY();
         final int ex = p2.getX(), ey = p2.getY();
 
-        if (sy < 0 || sy >= H || sx < 0 || sx >= W) return null;
-        if (ey < 0 || ey >= H || ex < 0 || ex >= W) return null;
+        // Bounds
+        if (sx < 0 || sx >= W || sy < 0 || sy >= H) return null;
+        if (ex < 0 || ex >= W || ey < 0 || ey >= H) return null;
 
+        // Optional: forbid starting/ending on obstacles
+        if (cells[sy][sx] == obsColor || cells[ey][ex] == obsColor) return null;
+
+        // Trivial case
         if (sx == ex && sy == ey) return new Pixel2D[]{p1};
 
-
-        final int obs = obsColor;
         final boolean[][] visited = new boolean[H][W];
         final int[][] parentX = new int[H][W];
         final int[][] parentY = new int[H][W];
         for (int y = 0; y < H; y++) {
-            Arrays.fill(parentY[y], -1);
-            Arrays.fill(parentX[y], -1);
+            java.util.Arrays.fill(parentX[y], -1);
+            java.util.Arrays.fill(parentY[y], -1);
         }
-        final int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        int move_count = 0;
-        int nodes_left = 1;
-        int nodes_next = 0;
-        boolean reached_end = false;
-        final ArrayDeque<int[]> q = new ArrayDeque<>();
-        q.add(new int[]{sx, sy});
+
+        final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}, { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}};
+        final java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
+
         visited[sy][sx] = true;
+        q.addLast(new int[]{sx, sy});
+
+        boolean found = false;
 
         while (!q.isEmpty()) {
             int[] cur = q.removeFirst();
-            int x = cur[0];
-            int y = cur[1];
+            int x = cur[0], y = cur[1];
+
+            if (x == ex && y == ey) {
+                found = true;
+                break;
+            }
+
             for (int[] d : directions) {
                 int nx = x + d[0];
                 int ny = y + d[1];
+
                 if (cyclic) {
-                    nx = ((nx % W) + W) % W;
-                    ny = ((ny % H) + H) % H;
+                    nx = (nx % W + W) % W;
+                    ny = (ny % H + H) % H;
                 } else {
-                    if (nx < 0 || nx >= W || ny < 0 || ny >= H)
-                        continue;
+                    if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
                 }
 
-                if ((!visited[ny][nx]) && (cells[ny][nx] != obsColor)) {
+                // Only enqueue if NOT visited and NOT obstacle
+                if (!visited[ny][nx] && cells[ny][nx] != obsColor) {
                     visited[ny][nx] = true;
                     parentX[ny][nx] = x;
                     parentY[ny][nx] = y;
+                    q.addLast(new int[]{nx, ny});
                 }
-                if ((x == ex) && (y == ey)) {
-                    reached_end = true;
-                    break;
-                }
-                q.add(new int[]{nx, ny});
             }
-            if (reached_end)
-                break;
         }
-        if (!reached_end)
-            return null;
 
+        if (!found) return null;
 
-        ArrayList<Pixel2D> rev = new java.util.ArrayList<>();
-        int cx = sx, cy = sy;
-        rev.add(new Index2D(cx, cy)); // replace SimplePixel with your Pixel2D implementation
-
-        while (!(cx == sx && cy == sy)) {
+        // Reconstruct path from end to start via parents
+        java.util.ArrayList<Pixel2D> path = new java.util.ArrayList<>();
+        int cx = ex, cy = ey;
+        while (true) {
+            path.add(new Index2D(cx, cy));
+            if (cx == sx && cy == sy) break; // reached start
             int px = parentX[cy][cx];
             int py = parentY[cy][cx];
-            if (px == -1 && py == -1) return null; // safety: should not happen
+            if (px == -1 && py == -1) return null; // safety
             cx = px;
             cy = py;
-            rev.add(new Index2D(cx, cy)); // replace SimplePixel if needed
         }
-
-        Collections.reverse(rev);
-        return rev.toArray(new Pixel2D[0]);
-
+        java.util.Collections.reverse(path);
+        ans = path.toArray(new Pixel2D[0]);
+        return ans;
     }
 
-    @Override
+        @Override
     public Map2D allDistance(Pixel2D start, int obsColor, boolean cyclic) {
         Map2D ans = null;  // the result.
         final int H = cells.length;
@@ -499,5 +503,4 @@ public class Map implements Map2D, Serializable {
             throw new IndexOutOfBoundsException("Out of bounds: (" + x + "," + y + ") for " + width + "x" + height);
         }
     }
-
 }

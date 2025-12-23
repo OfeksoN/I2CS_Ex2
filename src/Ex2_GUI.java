@@ -48,7 +48,8 @@ public class Ex2_GUI {
                     Color c = COLORS[v];;
 
                     StdDraw.setPenColor(c);
-                    StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.5, 0.5);
+                    int drawY = (H - 1) - y;
+                    StdDraw.filledRectangle(x, drawY , 0.5, 0.5);
                     //StdDraw.filledSquare( x + 0.5, y + 0.5, 0.5);
 
 
@@ -75,7 +76,6 @@ public class Ex2_GUI {
     public static Map2D loadMap(String mapFileName) {
         Map2D ans = null;
             try (BufferedReader br = new BufferedReader(new FileReader(mapFileName))) {
-                // Skip optional comment lines starting with '#'
                 String header;
                 while (true) {
                     header = br.readLine();
@@ -113,12 +113,11 @@ public class Ex2_GUI {
                     }
                 }
 
-                // Build your Map2D (adjust constructor or init as per your class)
-                ans = new Map(grid); // or: Map2D ans = new Map(W, H); ans.init(grid);
+                ans = new Map(grid);
                 return ans;
             } catch (Exception e) {
                 e.printStackTrace();
-                return null; // caller will get the earlier IllegalArgumentException from drawMap
+                return null;
             }
     }
 
@@ -131,10 +130,10 @@ public class Ex2_GUI {
             int W = map.getWidth();
             int H = map.getHeight();
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(mapFileName))) {
-                // header
+
                 bw.write(W + " " + H);
                 bw.newLine();
-                // body
+
                 for (int y = 0; y < H; y++) {
                     StringBuilder line = new StringBuilder();
                     for (int x = 0; x < W; x++) {
@@ -152,12 +151,42 @@ public class Ex2_GUI {
 
         public static void main(String[] a) {
 
-            Map sample = new Map(100,100,0);
+            Map sample = new Map(100,100,11);
+            int obstacle = 5;
             Index2D p1 = new Index2D(50,50);
-            Index2D p2 = new Index2D(60 , 60);
-            sample.drawCircle(p1, 20, 11);
-            int rgb = sample.getPixel(p1);
-            Color c = new Color(rgb, true);
+            Index2D p2 = new Index2D(10,10);
+            Index2D p3 = new Index2D(70 , 70);
+            Index2D p4 = new Index2D(40 , 30);
+            Index2D p5 = new Index2D(69 , 70);
+            Index2D p6 = new Index2D(69 , 99);
+            Index2D p7 = new Index2D(71 , 70);
+            Index2D p8 = new Index2D(71 , 99);
+            Index2D p9 = new Index2D(9 , 10);
+            Index2D p10 = new Index2D(9 , 0);
+            Index2D p11 = new Index2D(11 , 10);
+            Index2D p12 = new Index2D(11 , 0);
+            Index2D p13 = new Index2D(9 , 11);
+            Index2D p14 = new Index2D(11 , 11);
+            Index2D p15 = new Index2D(69 , 69);
+            Index2D p16 = new Index2D(71 , 69);
+
+            //sample.drawCircle(p1, 10, obstacle);
+            //sample.drawRect(p1,p4,obstacle);
+            sample.drawLine(p5, p6, obstacle);
+            sample.drawLine(p7, p8, obstacle);
+            sample.drawLine(p9, p10, obstacle);
+            sample.drawLine(p11, p12, obstacle);
+            sample.drawLine(p13, p14, obstacle);
+            sample.drawLine(p15, p16, obstacle);
+
+            //sample.fill(p1, obstacle, false);
+            sample.setPixel(p2, 0);
+            sample.setPixel(p3, 0);
+            Pixel2D[] Path = sample.shortestPath(p2,p3,obstacle,true);
+            //Map2D Path1 = sample.allDistance(p2,obstacle,false);
+            for (Pixel2D p:Path){sample.setPixel(p,0);}
+           // sample.fill(p2,11, true);
+
             saveMap(sample, "map.txt");
 
             // Now load & draw
@@ -166,5 +195,7 @@ public class Ex2_GUI {
         }
 
 ///////////////// Private functions ///////////////
+
+
 
 

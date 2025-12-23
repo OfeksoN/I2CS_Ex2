@@ -43,4 +43,48 @@ class MapTest {
         _m1.init(_map_3_3);
         assertEquals(_m0,_m1);
     }
+
+    @Test
+    void shortestPath_basic() {
+        Map m = new Map(5, 5, 0);
+        Pixel2D s = new Index2D(0, 0);
+        Pixel2D t = new Index2D(4, 4);
+        Pixel2D[] path = m.shortestPath(s, t, 1, false);
+        assertNotNull(path);
+        assertEquals(s.getX(), path[0].getX());
+        assertEquals(s.getY(), path[0].getY());
+        assertEquals(t.getX(), path[path.length-1].getX());
+        assertEquals(t.getY(), path[path.length-1].getY());
+    }
+
+    @Test
+    void shortestPath_checks_obstacles() {
+        Map m = new Map(3, 3, 0);
+        m.setPixel(1, 0, 1);
+        m.setPixel(1, 1, 1);
+        m.setPixel(1, 2, 1);
+        Pixel2D s = new Index2D(0, 1);
+        Pixel2D t = new Index2D(2, 1);
+        Pixel2D[] path = m.shortestPath(s, t, 1, false);
+        assertNull(path);
+    }
+
+    @Test
+    void allDistance_NullTest() {
+        Map m = new Map(5, 5, 0);
+        int obsColor = 1;
+        Pixel2D start = new Index2D(2, 2);
+
+        Map2D distMap = m.allDistance(start, obsColor, false);
+        assertNotNull(distMap);
+
+        // Check some representative cells
+        assertEquals(0, distMap.getPixel(2, 2), "Start must be distance 0");
+        assertEquals(1, distMap.getPixel(3, 2));
+        assertEquals(1, distMap.getPixel(1, 2));
+        assertEquals(1, distMap.getPixel(2, 1));
+        assertEquals(1, distMap.getPixel(2, 3));
+        assertEquals(2, distMap.getPixel(4, 2));
+        assertEquals(4, distMap.getPixel(0, 0));
+    }
 }
