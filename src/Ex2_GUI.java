@@ -9,28 +9,6 @@ import java.awt.Color;
  *
  */
 public class Ex2_GUI {
-    private static final Color[] COLORS = {
-            Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY,
-            Color.GRAY, Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA,
-            Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW
-    };
-    public static final int BLACK = 0;
-    public static final int BLUE = 1;
-    public static final int CYAN = 2;
-    public static final int DARK_GRAY = 3;
-    public static final int GRAY = 4;
-    public static final int GREEN = 5;
-    public static final int LIGHT_GRAY = 6;
-    public static final int MAGENTA = 7;
-    public static final int ORANGE = 8;
-    public static final int PINK = 9;
-    public static final int RED = 10;
-    public static final int WHITE = 11;
-    public static final int YELLOW = 12;
-
-
-
-
     public static void drawMap(Map2D map) {
             int W = map.getWidth();
             int H = map.getHeight();
@@ -45,7 +23,7 @@ public class Ex2_GUI {
             for (int y = 0; y < H; y++) {
                 for (int x = 0; x < W; x++) {
                     int v = map.getPixel(x, y);
-                    Color c = COLORS[v];;
+                    Color c = COLORS[v];
 
                     StdDraw.setPenColor(c);
                     int drawY = (H - 1) - y;
@@ -150,7 +128,7 @@ public class Ex2_GUI {
 
 
         public static void main(String[] a) {
-
+            final int BLACK = 0,BLUE = 1,CYAN = 2,DARK_GRAY = 3,GRAY = 4,GREEN = 5,LIGHT_GRAY = 6,MAGENTA = 7,ORANGE = 8,PINK = 9,RED = 10,WHITE = 11,YELLOW = 12;
             Map sample = new Map(100,100,11);
             int obstacle = 5;
             Index2D p1 = new Index2D(50,50);
@@ -170,8 +148,8 @@ public class Ex2_GUI {
             Index2D p15 = new Index2D(69 , 69);
             Index2D p16 = new Index2D(71 , 69);
 
-            //sample.drawCircle(p1, 10, obstacle);
-            //sample.drawRect(p1,p4,obstacle);
+            sample.drawCircle(p1, 10, obstacle);
+            sample.drawRect(p1,p4,obstacle);
             sample.drawLine(p5, p6, obstacle);
             sample.drawLine(p7, p8, obstacle);
             sample.drawLine(p9, p10, obstacle);
@@ -180,7 +158,7 @@ public class Ex2_GUI {
             sample.drawLine(p15, p16, obstacle);
 
             //sample.fill(p1, obstacle, false);
-            sample.setPixel(p2, 0);
+            sample.setPixel(p2, BLACK);
             sample.setPixel(p3, 0);
             Pixel2D[] Path = sample.shortestPath(p2,p3,obstacle,true);
             //Map2D Path1 = sample.allDistance(p2,obstacle,false);
@@ -195,7 +173,10 @@ public class Ex2_GUI {
         }
 
 ///////////////// Private functions ///////////////
-
+private static final Color[] COLORS = {
+        Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY,
+        Color.GRAY, Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA,
+        Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW };
 
 
 

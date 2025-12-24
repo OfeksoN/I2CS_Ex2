@@ -45,6 +45,51 @@ class MapTest {
     }
 
     @Test
+    void equals_SameSize_SameData() {
+        int[][] grid = {
+                {0, 1, 0},
+                {1, 0, 1},
+                {0, 1, 0}
+        };
+        Map a = new Map(grid);
+        Map b = new Map(grid);
+        assertTrue(a.equals(b), "Maps with identical content must be equal");
+        assertEquals(a, b, "equals() should agree with assertEquals");
+    }
+
+    @Test
+    void equals_SameSize_DifferentData() {
+        int[][] g1 = {
+                {0, 0},
+                {0, 0}
+        };
+        int[][] g2 = {
+                {0, 1},
+                {0, 0}
+        };
+        Map a = new Map(g1);
+        Map b = new Map(g2);
+        assertFalse(a.equals(b), "Maps with differing cells must not be equal");
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    void equals_DifferentSize() {
+        Map a = new Map(3, 3, 0);
+        Map b = new Map(4, 3, 0);
+        assertFalse(a.equals(b), "Maps of different sizes must not be equal");
+    }
+
+    @Test
+    void equals_noNulls() {
+        Map a = new Map(2, 2, 0);
+        assertFalse(a.equals(null), "equals(null) must be false");
+        assertFalse(a.equals("not a map"), "equals(non-Map) must be false");
+    }
+
+
+
+@Test
     void shortestPath_basic() {
         Map m = new Map(5, 5, 0);
         Pixel2D s = new Index2D(0, 0);
@@ -58,7 +103,7 @@ class MapTest {
     }
 
     @Test
-    void shortestPath_checks_obstacles() {
+    void shortestPath_ChecksObstacles() {
         Map m = new Map(3, 3, 0);
         m.setPixel(1, 0, 1);
         m.setPixel(1, 1, 1);
