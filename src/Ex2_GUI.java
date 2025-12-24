@@ -132,6 +132,7 @@ public class Ex2_GUI {
             Map sample = new Map(100,100,11);
             int obstacle = 5;
             Index2D p1 = new Index2D(50,50);
+            Index2D p20 = new Index2D(51,51);
             Index2D p2 = new Index2D(10,10);
             Index2D p3 = new Index2D(70 , 70);
             Index2D p4 = new Index2D(40 , 30);
@@ -154,13 +155,15 @@ public class Ex2_GUI {
             sample.drawLine(p7, p8, obstacle);
             sample.drawLine(p9, p10, obstacle);
             sample.drawLine(p11, p12, obstacle);
+            //sample.drawLine(p13, p14, obstacle);
+            //sample.drawLine(p15, p16, obstacle);
 
 
-            //sample.fill(p1, obstacle, false);
+            sample.fill(p20, obstacle, false);
             sample.setPixel(p2, BLACK);
             sample.setPixel(p3, 0);
             Pixel2D[] Path = sample.shortestPath(p2,p3,obstacle,false);
-            //Map2D Path1 = sample.allDistance(p2,obstacle,false);
+            Map2D Path1 = sample.allDistance(p2,obstacle,true);
             for (Pixel2D p:Path){sample.setPixel(p,0);}
            // sample.fill(p2,11, true);
 
