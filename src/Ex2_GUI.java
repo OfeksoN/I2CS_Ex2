@@ -27,8 +27,8 @@ public class Ex2_GUI {
 
                     StdDraw.setPenColor(c);
                     int drawY = (H - 1) - y;
-                    StdDraw.filledRectangle(x, drawY , 0.5, 0.5);
-                    //StdDraw.filledSquare( x + 0.5, y + 0.5, 0.5);
+                    //StdDraw.filledRectangle(x, drawY , 0.5, 0.5);
+                    StdDraw.filledSquare( x + 0.5, drawY +0.5, 0.5);
 
 
                 }
@@ -36,7 +36,7 @@ public class Ex2_GUI {
 
 
             StdDraw.setPenColor(new Color(0,0,0,40));
-            StdDraw.setPenRadius(0.015);
+            StdDraw.setPenRadius(0.000);
             for (int x = 0; x <= W; x++) {
                 StdDraw.line(x, 0, x, H);
             }
@@ -154,13 +154,12 @@ public class Ex2_GUI {
             sample.drawLine(p7, p8, obstacle);
             sample.drawLine(p9, p10, obstacle);
             sample.drawLine(p11, p12, obstacle);
-            sample.drawLine(p13, p14, obstacle);
-            sample.drawLine(p15, p16, obstacle);
+
 
             //sample.fill(p1, obstacle, false);
             sample.setPixel(p2, BLACK);
             sample.setPixel(p3, 0);
-            Pixel2D[] Path = sample.shortestPath(p2,p3,obstacle,true);
+            Pixel2D[] Path = sample.shortestPath(p2,p3,obstacle,false);
             //Map2D Path1 = sample.allDistance(p2,obstacle,false);
             for (Pixel2D p:Path){sample.setPixel(p,0);}
            // sample.fill(p2,11, true);
