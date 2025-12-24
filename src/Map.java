@@ -8,9 +8,7 @@ import java.util.Collections;
 /**
  * This class represents a 2D map (int[w][h]) as a "screen" or a raster matrix or maze over integers.
  * This is the main class needed to be implemented.
- *
  * @author boaz.benmoshe
- *
  */
 public class Map implements Map2D, Serializable {
     private int width;
@@ -21,7 +19,6 @@ public class Map implements Map2D, Serializable {
 
     /**
      * Constructs a w*h 2D raster map with an init value v.
-     *
      * @param w
      * @param h
      * @param v
@@ -32,7 +29,6 @@ public class Map implements Map2D, Serializable {
 
     /**
      * Constructs a square map (size*size).
-     *
      * @param size
      */
     public Map(int size) {
@@ -41,14 +37,10 @@ public class Map implements Map2D, Serializable {
 
     /**
      * Constructs a map from a given 2D array.
-     *
      * @param data
      */
     public Map(int[][] data) {
         init(data);
-    }
-    public Map() {
-        init(100,100,DEFAULT);
     }
 
     @Override
@@ -69,14 +61,14 @@ public class Map implements Map2D, Serializable {
     @Override
 
     public void init(int[][] arr) {
-//        if (arr == null || arr.length == 0 || arr[0] == null)
-//            throw new IllegalArgumentException("input array must be non-null and rectangular");
+       if (arr == null || arr.length == 0 || arr[0] == null)
+           throw new IllegalArgumentException("input array must be non-null and rectangular");
         int H = arr.length;
         int W = arr[0].length;
-//        for (int y = 1; y < H; y++) {
-//            if (arr[y] == null || arr[y].length != W)
-//                throw new IllegalArgumentException("input array must be rectangular");
-//        }
+        for (int y = 1; y < H; y++) {
+            if (arr[y] == null || arr[y].length != W)
+                 throw new IllegalArgumentException("input array must be rectangular");
+       }
         this.width = W;
         this.height = H;
         this.cells = new int[H][W];
@@ -176,7 +168,6 @@ public class Map implements Map2D, Serializable {
         int newH = Math.max(1, (int) Math.round(height * sy));
         int[][] out = new int[newH][newW];
 
-        // Nearest-neighbor resampling
         for (int ny = 0; ny < newH; ny++) {
             for (int nx = 0; nx < newW; nx++) {
                 int ox = Math.min(width - 1, (int) Math.round(nx / sx));
@@ -228,7 +219,6 @@ public class Map implements Map2D, Serializable {
     public void drawLine(Pixel2D p1, Pixel2D p2, int color) {
         int x0 = p1.getX(), y0 = p1.getY();
         int x1 = p2.getX(), y1 = p2.getY();
-        // Bresenham's line algorithm
         int dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
         int dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
         int err = dx + dy;
@@ -311,19 +301,15 @@ public class Map implements Map2D, Serializable {
         final ArrayDeque<int[]> q = new ArrayDeque<>();
         visited[fy][fx] = true;
         q.add(new int[]{fx, fy});
-
         final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}};
-
         while (!q.isEmpty()) {
             int[] cur = q.removeFirst();
             int x = cur[0];
             int y = cur[1];
-
             if (cells[y][x] == old) {
                 cells[y][x] = new_v;
                 ans++;
             }
-
             for (int[] d : directions) {
                 int nx = x + d[0];
                 int ny = y + d[1];
@@ -334,7 +320,6 @@ public class Map implements Map2D, Serializable {
                     if (nx < 0 || nx >= W || ny < 0 || ny >= H)
                         continue;
                 }
-
                 if (!visited[ny][nx] && cells[ny][nx] == old) {
                     visited[ny][nx] = true;
                     q.add(new int[]{nx, ny});
@@ -351,24 +336,15 @@ public class Map implements Map2D, Serializable {
      */
     public Pixel2D[] shortestPath(Pixel2D p1, Pixel2D p2, int obsColor, boolean cyclic) {
         Pixel2D[] ans = null;// the result.
-
         if (p1 == null || p2 == null) return null;
         final int H = cells.length;
         final int W = cells[0].length;
-
         final int sx = p1.getX(), sy = p1.getY();
         final int ex = p2.getX(), ey = p2.getY();
-
-        // Bounds
         if (sx < 0 || sx >= W || sy < 0 || sy >= H) return null;
         if (ex < 0 || ex >= W || ey < 0 || ey >= H) return null;
-
-        // Optional: forbid starting/ending on obstacles
         if (cells[sy][sx] == obsColor || cells[ey][ex] == obsColor) return null;
-
-        // Trivial case
         if (sx == ex && sy == ey) return new Pixel2D[]{p1};
-
         final boolean[][] visited = new boolean[H][W];
         final int[][] parentX = new int[H][W];
         final int[][] parentY = new int[H][W];
@@ -376,15 +352,11 @@ public class Map implements Map2D, Serializable {
             java.util.Arrays.fill(parentX[y], -1);
             java.util.Arrays.fill(parentY[y], -1);
         }
-
         final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}, { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}};
         final java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
-
         visited[sy][sx] = true;
         q.addLast(new int[]{sx, sy});
-
         boolean found = false;
-
         while (!q.isEmpty()) {
             int[] cur = q.removeFirst();
             int x = cur[0], y = cur[1];
@@ -393,19 +365,15 @@ public class Map implements Map2D, Serializable {
                 found = true;
                 break;
             }
-
             for (int[] d : directions) {
                 int nx = x + d[0];
                 int ny = y + d[1];
-
                 if (cyclic) {
                     nx = (nx % W + W) % W;
                     ny = (ny % H + H) % H;
                 } else {
                     if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
                 }
-
-                // Only enqueue if NOT visited and NOT obstacle
                 if (!visited[ny][nx] && cells[ny][nx] != obsColor) {
                     visited[ny][nx] = true;
                     parentX[ny][nx] = x;
@@ -414,10 +382,7 @@ public class Map implements Map2D, Serializable {
                 }
             }
         }
-
         if (!found) return null;
-
-        // Reconstruct path from end to start via parents
         java.util.ArrayList<Pixel2D> path = new java.util.ArrayList<>();
         int cx = ex, cy = ey;
         while (true) {
@@ -440,34 +405,26 @@ public class Map implements Map2D, Serializable {
         final int H = cells.length;
         final int W = cells[0].length;
         final int sx = start.getX(), sy = start.getY();
-
         int[][] dist = new int[H][W];
         for (int y = 0; y < H; y++) java.util.Arrays.fill(dist[y], -1);
-
         if (sx < 0 || sx >= W || sy < 0 || sy >= H) {
             return new Map(dist);
         }
         if (cells[sy][sx] == obsColor) {
-            // Start on obstacle: return dist with obstacles marked, others -1
             for (int y = 0; y < H; y++)
                 for (int x = 0; x < W; x++)
                     if (cells[y][x] == obsColor) dist[y][x] = obsColor;
             return new Map(dist);
         }
-
-        // Mark obstacles explicitly
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++)
                 if (cells[y][x] == obsColor) dist[y][x] = obsColor;
-
         final boolean[][] visited = new boolean[H][W];
         final ArrayDeque<int[]> q = new ArrayDeque<>();
         final int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
         visited[sy][sx] = true;
         dist[sy][sx] = 0;
         q.add(new int[]{sx, sy});
-
         while (!q.isEmpty()) {
             int[] cur = q.removeFirst();
             int x = cur[0], y = cur[1];
@@ -481,16 +438,13 @@ public class Map implements Map2D, Serializable {
                 } else {
                     if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
                 }
-
                 if (visited[ny][nx]) continue;
                 if (cells[ny][nx] == obsColor) continue;
-
                 visited[ny][nx] = true;
                 dist[ny][nx] = dist[y][x] + 1;
                 q.add(new int[]{nx, ny});
             }
         }
-
         ans = new Map(dist);
         return ans;
     }
