@@ -161,7 +161,7 @@ public class Ex2_GUI {
 
             Pikachu.setPixel(Pikachu1, BLUE);
             Pikachu.setPixel(Pikachu2, BLUE);
-            Pixel2D[] Path2 = Pikachu.shortestPath(Pikachu1, Pikachu2, obstacle, false);
+            Pixel2D[] Path2 = Pikachu.shortestPath(Pikachu1, Pikachu2, obstacle, true);
             for (Pixel2D pixel : Path2) {
                 Pikachu.setPixel(pixel, BLUE);
             }
