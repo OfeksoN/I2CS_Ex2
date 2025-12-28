@@ -181,6 +181,24 @@ public class Map implements Map2D, Serializable {
     }
 
     @Override
+    /**
+     * Draws the outline of a circle centered at {@code center} with radius {@code rad}
+     * on the grid using the specified color. Uses the midpoint (Bresenham) circle algorithm
+     * with 8-way symmetry for efficient integer rasterization.
+     *
+     * Behavior:
+     * - Rounds {@code rad} to the nearest integer.
+     * - If r < 0, throws IllegalArgumentException.
+     * - If r == 0, colors only the center pixel.
+     * - If r > 0, plots the circle perimeter by setting symmetric points around the center.
+     *
+     * @param center the circle center (x,y).
+     * @param rad    the desired radius (will be rounded to nearest integer).
+     * @param color  the color value to apply to the circle’s perimeter.
+     *
+     * @implNote Integer-only midpoint circle algorithm; plots 8 symmetric points per step.
+     * @complexity O(r) time; O(1) extra space.
+     */
     public void drawCircle(Pixel2D center, double rad, int color) {
         int cx = center.getX();
         int cy = center.getY();
@@ -216,6 +234,20 @@ public class Map implements Map2D, Serializable {
     }
 
     @Override
+    /**
+     * Draws a straight line between two pixels (p1 and p2) on the grid using the specified color.
+     * Implements Bresenham's line algorithm for accurate rasterization.
+     *
+     * Behavior:
+     * - Colors all pixels along the shortest path between p1 and p2.
+     * - Works for horizontal, vertical, and diagonal lines.
+     *
+     * @param p1    starting pixel of the line.
+     * @param p2    ending pixel of the line.
+     * @param color the color value to apply to the line.
+     *
+     * @implNote Uses Bresenham's algorithm for efficient integer-based line drawing.
+     */
     public void drawLine(Pixel2D p1, Pixel2D p2, int color) {
         int x0 = p1.getX(), y0 = p1.getY();
         int x1 = p2.getX(), y1 = p2.getY();
@@ -238,6 +270,20 @@ public class Map implements Map2D, Serializable {
     }
 
     @Override
+    /**
+     * Draws the outline of a rectangle on the grid using the specified color.
+     * The rectangle is defined by two corner pixels (p1 and p2), regardless of order.
+     *
+     * Behavior:
+     * - If p1 == p2, sets that single pixel to the given color.
+     * - Otherwise, computes the rectangle bounds and colors its perimeter:
+     *   - Horizontal edges: from x1 to x2 at y1 and y2.
+     *   - Vertical edges: from y1 to y2 at x1 and x2.
+     *
+     * @param p1    one corner of the rectangle.
+     * @param p2    opposite corner of the rectangle.
+     * @param color the color value to apply to the rectangle's border.
+     */
     public void drawRect(Pixel2D p1, Pixel2D p2, int color) {
         if (p1 == p2) {
             setPixel(p1.getX(), p1.getY(), color);
@@ -258,6 +304,16 @@ public class Map implements Map2D, Serializable {
     }
 
     @Override
+    /**
+     * Compares this Map object to another for equality.
+     * Two maps are considered equal if:
+     * - The other object is an instance of Map.
+     * - Both maps have the same width and height.
+     * - All corresponding cells contain the same values.
+     *
+     * @param ob the object to compare with this map.
+     * @return true if the maps are equal in size and content; false otherwise.
+     */
     public boolean equals(Object ob) {
         boolean ans = true;
         if(ob instanceof Map){
@@ -281,6 +337,29 @@ public class Map implements Map2D, Serializable {
 
     @Override
     /**
+     * Flood-fills a connected region (4-neighbor adjacency) starting at xy,
+     * replacing all cells equal to the starting cell's value with new_v.
+     * Supports optional cyclic wrap-around at grid edges.
+     *
+     * Behavior:
+     * - Starting from (fx, fy), visits all reachable cells whose value equals
+     *   the original value at (fx, fy) and sets them to new_v.
+     * - Returns the number of cells changed.
+     * - If (fx, fy) is out of bounds or the original value already equals new_v,
+     *   no changes are made and 0 is returned.
+     * - If cyclic == true, neighbor moves wrap across borders (torus);
+     *   otherwise, out-of-bounds neighbors are ignored.
+     * Implementation:
+     * - BFS with a queue and a visited[][] mask over 4 directions: {±1,0}, {0,±1}.
+     * - Each cell is processed at most once; only cells matching the original value are enqueued.
+     *
+     * @param xy      starting pixel (x,y).
+     * @param new_v   replacement value to write into the region.
+     * @param cyclic  true for wrap-around edges; false for bounded grid.
+     * @return        the count of cells that were updated.
+     *
+     * @complexity    O(H*W) time and O(H*W) space in the worst case (grid size).
+     *
      * Fills this map with the new color (new_v) starting from p.
      * https://en.wikipedia.org/wiki/Flood_fill
      */
@@ -331,6 +410,28 @@ public class Map implements Map2D, Serializable {
 
     @Override
     /**
+     * Finds a shortest Manhattan (4-neighbor) path between two cells in a 2D grid,
+     * optionally with cyclic wrap-around. Obstacles (cells equal to obsColor) are blocked.
+     * Behavior:
+     * - Returns an array of Pixel2D from p1 to p2 (inclusive) representing a shortest path.
+     * - If p1 == p2, returns a single-element array { p1 }.
+     * - If either endpoint is out of bounds, on an obstacle, or p2 is unreachable,
+     *   returns null.
+     * - If cyclic == true, stepping off an edge wraps to the opposite side (torus);
+     *   otherwise, moves leaving the grid are ignored.
+     * Implementation:
+     * - Uses BFS with a queue and a visited matrix to discover the target.
+     * - Stores parent coordinates (parentX/parentY) to reconstruct the path once p2 is found.
+     * - Reconstruction walks backward from p2 to p1, then reverses the list.
+     *
+     * @param p1       start pixel (x,y).
+     * @param p2       target pixel (x,y).
+     * @param obsColor grid value denoting obstacles (non-traversable cells).
+     * @param cyclic   true for wrap-around edges; false for bounded grid.
+     * @return Pixel2D[] shortest path from p1 to p2, or null if no path exists or inputs invalid.
+     *
+     * @complexity O(H*W) time and O(H*W) space in the worst case (grid size).
+     *
      * BFS like shortest the computation based on iterative raster implementation of BFS, see:
      * https://en.wikipedia.org/wiki/Breadth-first_search
      */
@@ -398,8 +499,28 @@ public class Map implements Map2D, Serializable {
         ans = path.toArray(new Pixel2D[0]);
         return ans;
     }
-
-        @Override
+    @Override
+    /**
+     * Computes shortest Manhattan (4‑neighbor) distances from a starting cell over a 2D grid.
+     * Obstacles (cells equal to obsColor) are not traversable. Optionally wraps at edges.
+     *
+     * Behavior:
+     * - Returns an int[][] wrapped in Map2D where:
+     *   - dist[sy][sx] = 0 at start (if inside and not an obstacle).
+     *   - dist[y][x] = k is the minimum number of steps from start to (x, y).
+     *   - dist[y][x] = -1 for unreachable non‑obstacle cells.
+     *   - dist[y][x] = obsColor for obstacle cells (copied from input).
+     * - If start is out of bounds or on an obstacle, no BFS is run; only obstacles are marked.
+     * - If cyclic == true, the grid is toroidal (moves wrap with modulo); otherwise borders are hard.
+     *
+     * @param start    starting pixel (x,y).
+     * @param obsColor grid value denoting obstacles (blocked cells).
+     * @param cyclic   true for wrap‑around edges; false for bounded grid.
+     * @return Map2D containing the distance matrix as described above.
+     *
+     * @implNote Uses BFS with a queue and a visited matrix.
+     * @complexity O(H*W) time and O(H*W) space.
+     */
     public Map2D allDistance(Pixel2D start, int obsColor, boolean cyclic) {
         Map2D ans = null;  // the result.
         final int H = cells.length;
