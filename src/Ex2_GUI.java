@@ -159,6 +159,7 @@ public class Ex2_GUI {
             //sample.drawLine(p13, p14, obstacle);
             //sample.drawLine(p15, p16, obstacle);
 
+            assert Pikachu != null;
             Pikachu.setPixel(Pikachu1, BLUE);
             Pikachu.setPixel(Pikachu2, BLUE);
             Pixel2D[] Path2 = Pikachu.shortestPath(Pikachu1, Pikachu2, obstacle, false);
