@@ -352,7 +352,7 @@ public class Map implements Map2D, Serializable {
             java.util.Arrays.fill(parentX[y], -1);
             java.util.Arrays.fill(parentY[y], -1);
         }
-        final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}, { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}};
+        final int[][] directions = {{ 1,  0}, {-1,  0}, { 0,  1}, { 0, -1}};
         final java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
         visited[sy][sx] = true;
         q.addLast(new int[]{sx, sy});

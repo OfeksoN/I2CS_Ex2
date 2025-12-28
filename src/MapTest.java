@@ -132,4 +132,14 @@ class MapTest {
         assertEquals(2, distMap.getPixel(4, 2));
         assertEquals(4, distMap.getPixel(0, 0));
     }
+    @Test
+    void allDistance() {
+        int[][] data = {{4,3,2,3,4},{3,2,1,2,3},{2,1,0,1,2},{3,2,1,2,3},{4,3,2,3,4}};
+        _m0= new Map(data);
+        Index2D p2 = new Index2D(2, 2);
+        _m1=new Map(5);
+        Map2D map= new Map(5);
+        map=_m1.allDistance(p2,4,false);
+        assertEquals(_m0,map);
+    }
 }
